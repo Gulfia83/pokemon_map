@@ -1,5 +1,6 @@
 import folium
 import json
+from folium.features import DivIcon
 
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
@@ -16,17 +17,20 @@ DEFAULT_IMAGE_URL = (
 )
 
 
-def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
+def add_pokemon(folium_map, lat, lon, health, strength, defense, image_url=DEFAULT_IMAGE_URL):
+    
     icon = folium.features.CustomIcon(
         image_url,
         icon_size=(50, 50),
     )
+    data = f'Здоровье: {health}, Сила: {strength}, Защита: {defense}'
     folium.Marker(
         [lat, lon],
         # Warning! `tooltip` attribute is disabled intentionally
         # to fix strange folium cyrillic encoding bug
+        popup=data,
         icon=icon,
-    ).add_to(folium_map)
+        ).add_to(folium_map)
 
 
 def show_all_pokemons(request):
@@ -43,7 +47,10 @@ def show_all_pokemons(request):
         add_pokemon(
             folium_map, entity.lat,
             entity.lon,
-            entity.pokemon.photo.path
+            entity.health,
+            entity.strength,
+            entity.defense,
+            entity.pokemon.photo.path,
             )
 
         pokemons_on_page.append({
@@ -68,6 +75,9 @@ def show_pokemon(request, pokemon_id):
         add_pokemon(
             folium_map, pokemon_entity.lat,
             pokemon_entity.lon,
+            pokemon_entity.health,
+            pokemon_entity.strength,
+            pokemon_entity.defense,
             pokemon.photo.path
         )
     
