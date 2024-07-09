@@ -110,7 +110,7 @@ def show_pokemon(request, pokemon_id):
         pokemon_data['element_type'].append({
             'title': element_type.title,
             'img': element_type.img.url,
-            'strong_against': [elem[1] for elem in element_type.strong_against.values_list()]
+            'strong_against': list(element_type.strong_against.values_list('title', flat=True))
         })
                  
     return render(request, 'pokemon.html', context={
