@@ -1,5 +1,20 @@
 from django.db import models  # noqa F401
 
+class PokemonElementType(models.Model):
+    title = models.CharField(max_length=200,
+                             verbose_name='Стихии')
+    img = models.ImageField(null=True,
+                            blank=True,
+                            verbose_name='Изображение стихии')
+    strong_against = models.ManyToManyField("self",
+                                            symmetrical=False,
+                                            verbose_name='Силен против',
+                                            null=True,
+                                            blank=True)
+    
+    def __str__(self):
+        return self.title
+    
 
 class Pokemon(models.Model):
     title = models.CharField(max_length=200,
@@ -25,6 +40,7 @@ class Pokemon(models.Model):
                                            blank=True,
                                            verbose_name='Из кого эволюционировал',
                                            related_name='next_evolutions')
+    element_type = models.ManyToManyField(PokemonElementType)
     
     def __str__(self):
         return self.title
@@ -63,3 +79,5 @@ class PokemonEntity(models.Model):
 
     def __str__(self):
         return self.pokemon.title
+    
+

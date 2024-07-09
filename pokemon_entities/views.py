@@ -3,7 +3,7 @@ import json
 
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from .models import Pokemon, PokemonEntity
+from .models import Pokemon, PokemonEntity, PokemonElementType
 from django.utils.timezone import localtime
 from django.shortcuts import get_object_or_404
 
@@ -63,6 +63,7 @@ def show_pokemon(request, pokemon_id):
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     pokemon_entities = PokemonEntity.objects.filter(pokemon=pokemon)
+    element_types = PokemonElementType.objects.filter(pokemon=pokemon)
     for pokemon_entity in pokemon_entities:
         add_pokemon(
             folium_map, pokemon_entity.lat,
@@ -93,7 +94,15 @@ def show_pokemon(request, pokemon_id):
             'pokemon_id': next_evolution.id,
             'img_url': next_evolution.photo.url
         }
-        
+
+    pokemon_data['element_type'] = []
+    for element_type in element_types:
+        pokemon_data['element_type'].append({
+            'title': element_type.title,
+            'img': element_type.img.url,
+            'strong_against': [elem[1] for elem in element_type.strong_against.values_list()]
+        })
+                 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 
         'pokemon': pokemon_data
